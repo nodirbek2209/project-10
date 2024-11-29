@@ -15,7 +15,7 @@ public class JackTokenizer {
 
     private List<String> tokens;
     private int pointer;
-    private String thisToken;
+    private static String thisToken;
     private String fileName;
     private String filePath;
     private final String BLANK = " ";
@@ -130,7 +130,7 @@ public class JackTokenizer {
     }
 
 
-    public TokenType tokenType() {
+    public static TokenType tokenType() {
         // TODO: Implement token type determination logic
         // Hints:
         // - Check if `thisToken` is in the `keywords` list and return `KEYWORD` if true.
@@ -139,17 +139,33 @@ public class JackTokenizer {
         // - Check if `thisToken` starts and ends with double quotes to identify string constants and return `STRING_CONSTANT` if true.
         // - If `thisToken` starts with a digit, throw a `RuntimeException` for syntax error.
         // - If none of the above conditions are met, return `IDENTIFIER`.
-        return null;
+
+        if (keywords.contains(thisToken)) {
+            return TokenType.KEYWORD;
+        }
+        if (symbols.contains(thisToken)) {
+            return TokenType.SYMBOL;
+        }
+        if (NumberUtils.isNumeric(thisToken)) {
+            return TokenType.INT_CONSTANT;
+        }
+        if (thisToken.startsWith("\"") && thisToken.endsWith("\"")) {
+            return TokenType.STRING_CONSTANT;
+        }
+        if (Character.isDigit(thisToken.charAt(0))) {
+            throw new RuntimeException("Syntax error: Token cannot start with a digit");
+        }
+        return TokenType.IDENTIFIER;
     }
 
-    public String keyword() {
+    public static String keyword() {
         if (tokenType() != KEYWORD) {
             throw new RuntimeException("only when type of token is 'KEYWORD' can keyword()");
         }
         return thisToken;
     }
 
-    public String symbol() {
+    public static String symbol() {
         if (tokenType() != SYMBOL) {
             throw new RuntimeException("only when type of token is 'SYMBOL' can symbol()");
         }
@@ -168,21 +184,21 @@ public class JackTokenizer {
         return token;
     }
 
-    public String identifier() {
+    public static String identifier() {
         if (tokenType() != IDENTIFIER) {
             throw new RuntimeException("only when type of token is 'IDENTIFIER' can identifier()");
         }
         return thisToken;
     }
 
-    public int intVal() {
+    public static int intVal() {
         if (tokenType() != INT_CONSTANT) {
             throw new RuntimeException("only when type of token is 'INT_CONSTANT' can intVal()");
         }
         return Integer.parseInt(thisToken);
     }
 
-    public String stringVal() {
+    public static String stringVal() {
         if (tokenType() != STRING_CONSTANT) {
             throw new RuntimeException("only when type of token is 'STRING_CONSTANT' can stringVal()");
         }
@@ -193,7 +209,7 @@ public class JackTokenizer {
         pointer = -1;
     }
 
-    public String getThisToken() {
+    public static String getThisToken() {
         return switch (tokenType()) {
             case SYMBOL -> symbol();
             case KEYWORD -> keyword();
@@ -221,7 +237,7 @@ public class JackTokenizer {
         return filePath;
     }
 
-    public boolean isKeywordConstant() {
+    public static boolean isKeywordConstant() {
         if (thisToken.equals(KEYWORD_TRUE) ||
                 thisToken.equals(KEYWORD_FALSE) ||
                 thisToken.equals(KEYWORD_NULL) ||
@@ -277,7 +293,7 @@ public class JackTokenizer {
         return false;
     }
 
-    public boolean isOp() {
+    public static boolean isOp() {
         if (tokenType() == TokenType.SYMBOL) {
             switch (thisToken) {
                 case "+":
@@ -297,7 +313,7 @@ public class JackTokenizer {
         return false;
     }
 
-    public boolean isUnaryOp() {
+    public static boolean isUnaryOp() {
         if (tokenType() == TokenType.SYMBOL &&
                 (thisToken.equals("-") || thisToken.equals("~"))) {
             return true;
